@@ -1,0 +1,25 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: bankdb
+      POSTGRES_USER: bank
+      POSTGRES_PASSWORD: bank
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/data/postgres
+      - ./backend/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+
+  api:
+    build: ./backend
+    environment:
+      DATABASE_URL: postgres://bank:bank@postgres:5432/bankdb?sslmode=disable
+      PORT: 8080
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+
+volumes:
+  postgres_data:
